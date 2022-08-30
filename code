@@ -1,1 +1,209 @@
 this is code for lab
+[7:43 pm, 29/08/2022] Nyan: #include <iostream>
+
+using namespace std;
+
+template <typename T> class Vector
+{
+    private:
+        T *arr;
+        int currsize;
+        int capacity;
+
+    public:
+        Vector(int n=1){
+            arr = new T[n];
+            currsize = 0;
+            capacity = n;
+        }
+        ~Vector(){
+            delete []arr;
+        }
+        int curr_size(){return currsize;}
+        int capa_city(){return capacity;}
+        T & operator[](int index){
+            if(index < currsize){
+                return arr[index];
+            }
+            if(index > currsize){
+                cout << "Error" << endl;
+                exit(1);
+            }
+            if(currsize == capacity) {
+                T *narr = new T[2*capacity];
+                for(int i=0;i<currsize;i++)
+                {
+                    narr[i] = arr[i];
+                }
+                delete []arr;
+                arr = narr;
+                capacity = 2*capacity;
+            }
+            if(currsize < capacity/4) {
+                T *narr = new T[capacity/4];
+                for(int i=0;i<currsize;i++)
+                {
+                    narr[i] = arr[i];
+                }
+                delete []arr;
+                arr = narr;
+                capacity = capacity/4;
+            }
+            currsize+=1;
+            return arr[index];
+        }
+};
+template <typename T> class Stack {
+
+    private:
+        Vector<T> v;
+        int top;
+    public:
+        Stack() {
+            this->top = -1;
+        }
+
+        void push(T j) {
+            this->v[++this->top] = j;
+        }
+
+        int pop() {
+            if (!(this->isEmpty())) {
+
+                return this->v[this->top--];
+            } else {
+                cout << "\nstack is empty"<<endl;
+[7:43 pm, 29/08/2022] Nyan: cout<<  "Stack Underflow "<<endl;
+                exit(1);
+            }
+        }
+
+        int _top() {
+            return this->v[this->top];
+        }
+        bool isEmpty() {
+            return (this->top == -1);
+        }
+        int capacity(){return v.capa_city();}
+};
+
+
+
+int priority (char alpha){
+    if(alpha == '+' || alpha =='-')
+        return 1;
+
+    if(alpha == '*' || alpha =='/')
+        return 2;
+
+    if(alpha == '^')
+        return 3;
+
+
+    return 0;
+}
+string convert(string infix)
+{
+    int i = 0;
+    string postfix = "";
+   
+    Stack <int>s;
+
+    while(infix[i]!='\0')
+    {
+      
+        if(infix[i]>='0' && infix[i]<='9')
+        {
+            postfix += infix[i];
+            i++;
+        }
+        
+        else if(infix[i]=='(')
+        {
+            s.push(infix[i]);
+            i++;
+        }
+
+        else if(infix[i]==')')
+        {
+            while(s._top()!='('){
+                postfix += s._top();
+                s.pop();
+            }
+            s.pop();
+            i++;
+        }
+        else
+        {
+            while (!s.isEmpty() && priority(infix[i]) <= priority(s._top())){
+                postfix += s._top();
+                s.pop();
+            }
+            s.push(infix[i]);
+            i++;
+        }
+    }
+    while(!s.isEmpty()){
+        postfix += s._top();
+        s.pop();
+    }
+
+
+   
+    return postfix;
+}
+    int calculate_Postfix(string  post_exp)
+{
+    Stack <int> stack;
+    int len = post_exp.length();
+    
+    for (int i = 0; i < len; i++)
+    {
+               if ( post_exp[i] >= '0' &&  post_exp[i] <= '9')
+        {
+            stack.push( post_exp[i] - '0');
+        }
+         else
+        {
+            
+            int a = stack._top();
+            stack.pop();
+            int b = stack._top();
+            stack.pop();
+
+            switch (post_exp[i])
+            {
+                case '+': 
+                          stack.push(b + a);
+                          break;
+                case '-': 
+                          stack.push(b - a);
+                          break;
+                case '*': 
+                          stack.push(b * a);
+                          break;
+                case '/': 
+                          stack.push(b / a);
+                          break;
+             
+            }
+        }
+    }
+   
+    return stack._top();
+}
+
+
+int main()
+{
+    cout << "Welcome to the calculator!" << endl;
+    string infixString;
+    string postFixString;
+    cout << "Enter the expression you would like to evaluate: ";
+    getline( cin, infixString );
+    postFixString = convert ( infixString );
+    cout << postFixString << endl;
+    cout << "The value of the given expression is: " <<  calculate_Postfix( postFixString ) << endl;
+
+    return 0;
+}
